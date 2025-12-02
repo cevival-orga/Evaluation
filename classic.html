@@ -1,35 +1,48 @@
-<div id="peak-dle" style="max-width: 600px; margin: 0 auto; font-family: sans-serif;">
+<div id="peak-dle" style="max-width: 900px; margin: 0 auto; font-family: sans-serif;">
   <h2>Guess the PEAK Item!</h2>
   <input type="text" id="guess-input" placeholder="Type your guess..." style="width: 70%; padding: 5px;">
   <button id="guess-button" style="padding: 5px 10px;">Guess</button>
   <div id="feedback" style="margin-top: 20px;"></div>
-  <table id="hint-table" style="margin-top: 10px; border-collapse: collapse; width: 100%; display: none;">
-    <thead>
-      <tr>
-        <th style="border: 1px solid #ccc; padding: 5px;">Property</th>
-        <th style="border: 1px solid #ccc; padding: 5px;">Value</th>
-      </tr>
-    </thead>
-    <tbody id="hint-body"></tbody>
-  </table>
+  <div id="hint-grid" style="display: flex; gap: 5px; margin-top: 10px;"></div>
 </div>
 
 <script>
 (async () => {
-  // Load the list.json
+  // Load list.json
   const response = await fetch('list.json');
   const items = await response.json();
 
   const itemNames = Object.keys(items);
   const targetItemName = itemNames[Math.floor(Math.random() * itemNames.length)];
   const targetItem = items[targetItemName];
+
   console.log(targetItem);
 
   const input = document.getElementById('guess-input');
   const button = document.getElementById('guess-button');
   const feedback = document.getElementById('feedback');
-  const table = document.getElementById('hint-table');
-  const tbody = document.getElementById('hint-body');
+  const hintGrid = document.getElementById('hint-grid');
+
+function compareValues(key, guessValue, targetValue) {
+  if (key === 'weight') {
+    if (guessValue === targetValue) return 'green';
+    // If guess > target → red, If guess < target → red (arrow shows direction)
+    return 'red';
+  }
+
+  if (key === 'uses') {
+    if (guessValue === targetValue) return 'green';
+    return 'red';
+  }
+
+  const gVals = Array.isArray(guessValue) ? guessValue : [guessValue];
+  const tVals = Array.isArray(targetValue) ? targetValue : [targetValue];
+
+  const intersection = gVals.filter(v => tVals.includes(v));
+  if (intersection.length === 0) return 'red';
+  if (intersection.length < Math.max(gVals.length, tVals.length)) return 'yellow';
+  return 'green';
+}
 
   button.addEventListener('click', () => {
     const guess = input.value.trim();
@@ -37,41 +50,51 @@
 
     if (guess === targetItemName) {
       feedback.innerHTML = `<span style="color: green; font-weight: bold;">Correct! The item was ${targetItemName}.</span>`;
-      table.style.display = 'none';
+      hintGrid.style.display = 'none';
       input.disabled = true;
       button.disabled = true;
-    } else if (items[guess]) {
-      feedback.innerHTML = `<span style="color: red;">Incorrect! Here's some info about ${guess}:</span>`;
-      // Show hints table
-      tbody.innerHTML = '';
+      return;
+    }
+
+    if (items[guess]) {
       const guessedItem = items[guess];
-      Object.entries(guessedItem).forEach(([key, value]) => {
+      feedback.innerHTML = `<span style="color: red;">Incorrect! Here's some info about ${guess}:</span>`;
+
+      hintGrid.innerHTML = '';
+        Object.entries(guessedItem).forEach(([key, value]) => {
         if (key !== 'icon') {
-          const row = document.createElement('tr');
-          const propCell = document.createElement('td');
-          const valueCell = document.createElement('td');
-          propCell.textContent = key.charAt(0).toUpperCase() + key.slice(1);
-          valueCell.textContent = value;
-          propCell.style.border = '1px solid #ccc';
-          propCell.style.padding = '5px';
-          valueCell.style.border = '1px solid #ccc';
-          valueCell.style.padding = '5px';
-          row.appendChild(propCell);
-          row.appendChild(valueCell);
-          tbody.appendChild(row);
+            let bgColor = compareValues(key, value, targetItem[key]);
+
+            let displayValue = value;
+            // Only add arrow for weight
+            if (key === 'weight' && value !== targetItem['weight']) {
+            displayValue += value > targetItem['weight'] ? ' ↓' : ' ↑';
+            }
+
+            const square = document.createElement('div');
+            square.style.border = '1px solid #ccc';
+            square.style.padding = '10px';
+            square.style.minWidth = '120px';
+            square.style.textAlign = 'center';
+            square.style.borderRadius = '6px';
+            square.style.backgroundColor = bgColor;
+            square.style.color = 'white';
+            square.style.fontWeight = 'bold';
+            square.textContent = `${key.charAt(0).toUpperCase() + key.slice(1)}: ${displayValue}`;
+            hintGrid.appendChild(square);
         }
-      });
-      table.style.display = 'table';
+        });
+
+      hintGrid.style.display = 'flex';
     } else {
       feedback.innerHTML = `<span style="color: orange;">Invalid guess. Try again!</span>`;
-      table.style.display = 'none';
+      hintGrid.style.display = 'none';
     }
 
     input.value = '';
     input.focus();
   });
 
-  // Optional: allow pressing Enter to guess
   input.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
       button.click();
