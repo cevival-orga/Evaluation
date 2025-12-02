@@ -3,72 +3,107 @@
   <input type="text" id="guess-input" placeholder="Type your guess..." style="width: 70%; padding: 5px;">
   <button id="guess-button" style="padding: 5px 10px;">Guess</button>
   <div id="feedback" style="margin-top: 20px;"></div>
-  <div id="hint-grid" style="display: flex; gap: 5px; margin-top: 10px;"></div>
+  <div id="history-container" style="margin-top: 10px; display: flex; flex-direction: column-reverse; gap: 10px;"></div>
 </div>
 
 <script>
 (async () => {
-  // Load list.json
-  const response = await fetch('list.json');
-  const items = await response.json();
+  let currentItem;
+  
+  async function getRandomItemImageUrl() {
+    try {
+      const response = await fetch('datas.json');
+      const datas = await response.json();
 
-  const itemNames = Object.keys(items);
-  const targetItemName = itemNames[Math.floor(Math.random() * itemNames.length)];
-  const targetItem = items[targetItemName];
+      const itemNames = Object.keys(datas);
+      const randomIndex = Math.floor(Math.random() * itemNames.length);
+      const randomItemName = itemNames[randomIndex];
 
-  console.log(targetItem);
+      currentItem = {
+        name: randomItemName,
+        data: datas[randomItemName]
+      };
+
+      const iconName = datas[randomItemName].icon.replace(/ /g, '_');
+      return {
+        item: randomItemName,
+        url: `https://peak.wiki.gg/images/thumb/${iconName}.png/192px-${iconName}.png`
+      };
+    } catch (error) {
+      console.error('Error loading data:', error);
+      return null;
+    }
+  }
+
+  const target = await getRandomItemImageUrl();
+  console.log('Target item:', target);
 
   const input = document.getElementById('guess-input');
   const button = document.getElementById('guess-button');
   const feedback = document.getElementById('feedback');
-  const hintGrid = document.getElementById('hint-grid');
+  const historyContainer = document.getElementById('history-container');
 
-function compareValues(key, guessValue, targetValue) {
-  if (key === 'weight') {
-    if (guessValue === targetValue) return 'green';
-    // If guess > target → red, If guess < target → red (arrow shows direction)
-    return 'red';
+  function compareValues(key, guessValue, targetValue) {
+    if (key === 'weight') {
+      if (guessValue === targetValue) return 'green';
+      return 'red';
+    }
+
+    if (key === 'uses') {
+      if (guessValue === targetValue) return 'green';
+      return 'red';
+    }
+
+    const gVals = Array.isArray(guessValue) ? guessValue : [guessValue];
+    const tVals = Array.isArray(targetValue) ? targetValue : [targetValue];
+
+    const intersection = gVals.filter(v => tVals.includes(v));
+    if (intersection.length === 0) return 'red';
+    if (intersection.length < Math.max(gVals.length, tVals.length)) return 'yellow';
+    return 'green';
   }
-
-  if (key === 'uses') {
-    if (guessValue === targetValue) return 'green';
-    return 'red';
-  }
-
-  const gVals = Array.isArray(guessValue) ? guessValue : [guessValue];
-  const tVals = Array.isArray(targetValue) ? targetValue : [targetValue];
-
-  const intersection = gVals.filter(v => tVals.includes(v));
-  if (intersection.length === 0) return 'red';
-  if (intersection.length < Math.max(gVals.length, tVals.length)) return 'yellow';
-  return 'green';
-}
 
   button.addEventListener('click', () => {
     const guess = input.value.trim();
     if (!guess) return;
 
-    if (guess === targetItemName) {
-      feedback.innerHTML = `<span style="color: green; font-weight: bold;">Correct! The item was ${targetItemName}.</span>`;
-      hintGrid.style.display = 'none';
+    if (guess === target.item) {
+      feedback.innerHTML = `<span style="color: green; font-weight: bold;">Correct! The item was ${target.item}.</span>`;
       input.disabled = true;
       button.disabled = true;
       return;
     }
 
-    if (items[guess]) {
-      const guessedItem = items[guess];
-      feedback.innerHTML = `<span style="color: red;">Incorrect! Here's some info about ${guess}:</span>`;
+    fetch('datas.json')
+      .then(res => res.json())
+      .then(items => {
+        if (!items[guess]) {
+          feedback.innerHTML = `<span style="color: orange;">Invalid guess. Try again!</span>`;
+          return;
+        }
 
-      hintGrid.innerHTML = '';
+        const guessedItem = items[guess];
+
+        const guessRow = document.createElement('div');
+        guessRow.style.display = 'flex';
+        guessRow.style.gap = '5px';
+        guessRow.style.alignItems = 'center';
+
+        // Add icon
+        const iconImg = document.createElement('img');
+        iconImg.src = `https://peak.wiki.gg/images/thumb/${guessedItem.icon.replace(/ /g, '_')}.png/192px-${guessedItem.icon.replace(/ /g, '_')}.png`;
+        iconImg.style.width = '40px';
+        iconImg.style.height = '40px';
+        guessRow.appendChild(iconImg);
+
+        // Add categories
         Object.entries(guessedItem).forEach(([key, value]) => {
-        if (key !== 'icon') {
-            let bgColor = compareValues(key, value, targetItem[key]);
-
+          if (key !== 'icon') {
+            let bgColor = compareValues(key, value, currentItem.data[key]);
             let displayValue = value;
-            // Only add arrow for weight
-            if (key === 'weight' && value !== targetItem['weight']) {
-            displayValue += value > targetItem['weight'] ? ' ↓' : ' ↑';
+
+            if (key === 'weight' && value !== currentItem.data['weight']) {
+              displayValue += value < currentItem.data['weight'] ? ' ↑' : ' ↓';
             }
 
             const square = document.createElement('div');
@@ -81,24 +116,19 @@ function compareValues(key, guessValue, targetValue) {
             square.style.color = 'white';
             square.style.fontWeight = 'bold';
             square.textContent = `${key.charAt(0).toUpperCase() + key.slice(1)}: ${displayValue}`;
-            hintGrid.appendChild(square);
-        }
+            guessRow.appendChild(square);
+          }
         });
 
-      hintGrid.style.display = 'flex';
-    } else {
-      feedback.innerHTML = `<span style="color: orange;">Invalid guess. Try again!</span>`;
-      hintGrid.style.display = 'none';
-    }
+        historyContainer.prepend(guessRow);
+      });
 
     input.value = '';
     input.focus();
   });
 
   input.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-      button.click();
-    }
+    if (e.key === 'Enter') button.click();
   });
 })();
 </script>
