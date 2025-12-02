@@ -8,14 +8,13 @@
       content="Guess the Peak game! A daily guessing game based on the climbing game Peak."
     />
     <title>Peakdle - Guess the Peak Game</title>
-    <link rel="icon" href="images/PEAK_logo.jpg" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <!-- Navigation -->
     <nav class="navbar">
-      <div class="nav-brand" style="cursor: pointer">
-        <h1 id="nav-home">🏔️ PEAKDLE</h1>
+      <div class="nav-brand">
+        <h1>🏔️ PEAKDLE</h1>
       </div>
       <button class="nav-toggle" id="nav-toggle">
         <span></span>
@@ -163,7 +162,6 @@
 
           <!-- Image Display -->
           <div class="image-container">
-            <div class="blur-overlay" id="splash-blur"></div>
             <img
               id="splash-image"
               src=""
@@ -178,7 +176,7 @@
               type="text"
               id="splash-input"
               class="level-input"
-              placeholder="Enter level name or number..."
+              placeholder="Enter items..."
               autocomplete="off"
             />
             <button id="splash-submit" class="submit-btn">Guess</button>
@@ -237,7 +235,6 @@
             rel="noopener"
             >Peak</a
           >
-          by Stuff By Blob
         </p>
 
         <div class="footer-badge">
@@ -248,5 +245,6 @@
     </footer>
 
     <script src="js/script.js"></script>
+    <script src="js/blur.js"></script>
   </body>
 </html>
