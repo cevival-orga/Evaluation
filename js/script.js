@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const pages = document.querySelectorAll(".page");
   const playButtons = document.querySelectorAll(".play-btn");
   const backButtons = document.querySelectorAll(".back-btn");
-  const navHome = document.getElementById('nav-home');
+  const navHome = document.getElementById("nav-home");
 
   // Toggle burger menu
   if (navToggle) {
@@ -99,9 +99,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Logo nav-brand click (Home)
   if (navHome) {
-    navHome.addEventListener('click', function(e) {
+    navHome.addEventListener("click", function (e) {
       e.preventDefault();
-      switchPage('home');
+      switchPage("home");
     });
   }
 
