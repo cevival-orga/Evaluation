@@ -182,9 +182,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const resultLives = document.getElementById('classic-result-lives');
 
       // Helper: build icon URL (kept for guess rows)
-      function iconUrl(iconName) {
-        return `https://peak.wiki.gg/images/thumb/${String(iconName).replace(/ /g,'_')}.png/64px-${String(iconName).replace(/ /g,'_')}.png`;
-      }
+        function iconUrl(iconName) {
+        if (!iconName) return ''; 
+        const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
+        return `images/64px-images/64px-${fileName}.webp`;
+        }
 
       function updateLivesDisplay() {
         livesSpan.textContent = lives;
@@ -257,29 +259,46 @@ function addGuessRow(name) {
         suggestionsDiv.innerHTML = '';
       }
 
-      function showSuggestions() {
-        const q = input.value.trim().toLowerCase();
-        suggestionsDiv.innerHTML = '';
-        if (!q) return hideSuggestions();
+function showSuggestions() {
+  const q = input.value.trim().toLowerCase();
+  suggestionsDiv.innerHTML = '';
+  if (!q) return hideSuggestions();
 
-        const filtered = allItems.filter(i => i.toLowerCase().includes(q) && !guessedNames.has(i));
-        if (filtered.length === 0) return hideSuggestions();
+  const filtered = allItems.filter(i => i.toLowerCase().includes(q) && !guessedNames.has(i));
+  if (filtered.length === 0) return hideSuggestions();
 
-        filtered.slice(0, 10).forEach(name => {
-          const div = document.createElement('div');
-          div.className = 'suggestion-item';
-          // match Splash-mode visuals: plain text suggestion (no image)
-          div.textContent = name;
-          div.addEventListener('click', () => {
-            input.value = name;
-            hideSuggestions();
-            submitGuess();
-          });
-          suggestionsDiv.appendChild(div);
-        });
+  filtered.slice(0, 10).forEach(name => {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
 
-        suggestionsDiv.style.display = 'block';
-      }
+    // Create mini icon
+    const img = document.createElement('img');
+    img.src = iconUrl(items[name].Icon || name);
+    img.alt = name;
+    img.style.width = '24px';
+    img.style.height = '24px';
+    img.style.marginRight = '8px';
+    img.style.verticalAlign = 'middle';
+    img.style.objectFit = 'contain';
+    div.appendChild(img);
+
+    // Add name text
+    const span = document.createElement('span');
+    span.textContent = name;
+    div.appendChild(span);
+
+    // Click selects the item
+    div.addEventListener('click', () => {
+      input.value = name;
+      hideSuggestions();
+      submitGuess();
+    });
+
+    suggestionsDiv.appendChild(div);
+  });
+
+  suggestionsDiv.style.display = 'block';
+}
 
       function submitGuess() {
         const guess = input.value.trim();

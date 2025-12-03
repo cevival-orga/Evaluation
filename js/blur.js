@@ -6,17 +6,42 @@ let attempts = 0;
 let itemImg = null;
 let currentItem = null;
 let currentItemName = null;
+let items = {}, targetName = '', targetItem = null;
 let allItems = []; // Liste de tous les items pour l'autocomplétion
 let wrongGuesses = []; // Liste des mauvaises réponses
 
+let guessedNames = new Set();
+
+const input = document.getElementById('splash-input');
+const suggestionsDiv = document.getElementById('splash-suggestions');
+const guess = document.getElementById('splash-guesses');
 // Fonction pour charger et choisir un item aléatoire
+
+function hideSuggestions() {
+suggestionsDiv.style.display = 'none';
+suggestionsDiv.innerHTML = '';
+}
+
+function iconUrl192(iconName) {
+if (!iconName) return ''; 
+const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
+return `images/192px-images/192px-${fileName}.webp`;
+}
+
+function iconUrl64(iconName) {
+if (!iconName) return ''; 
+const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
+return `images/64px-images/64px-${fileName}.webp`;
+}
+
+
 async function getRandomItemImageUrl() {
   try {
     const response = await fetch('datas.json');
-    const datas = await response.json();
+    items = await response.json();
 
     // Récupère tous les noms d'items
-    const itemNames = Object.keys(datas);
+    const itemNames = Object.keys(items);
 
     // Sélectionne un item aléatoire
     const randomIndex = Math.floor(Math.random() * itemNames.length);
@@ -25,14 +50,14 @@ async function getRandomItemImageUrl() {
     // Stocke l'item actuel
     currentItem = {
       name: randomItemName,
-      data: datas[randomItemName]
+      data: items[randomItemName]
     };
 
     // Retourne l'objet avec le nom et l'URL
-    const iconName = datas[randomItemName].icon.replace(/ /g, '_');
+    const iconName = items[randomItemName].icon.replace(/ /g, '_');
     return {
       item: randomItemName,
-      url: `https://peak.wiki.gg/images/thumb/${iconName}.png/192px-${iconName}.png`
+      url: iconUrl192(iconName)
     };
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error);
@@ -66,54 +91,55 @@ async function loadRandomImage(imgElement) {
 async function loadItemsList() {
   try {
     const response = await fetch('datas.json');
-    const datas = await response.json();
-    allItems = Object.keys(datas);
+    items = await response.json();
+    allItems = Object.keys(items);
   } catch (error) {
     console.error('Erreur lors du chargement de la liste des items:', error);
   }
 }
 
 // Fonction pour filtrer et afficher les suggestions
-function showSuggestions(input, suggestionsDiv) {
-  const searchValue = input.value.trim().toLowerCase();
+function showSuggestions() {
+  const q = input.value.trim().toLowerCase();
+  suggestionsDiv.innerHTML = '';
+  if (!q) return hideSuggestions();
 
-  // Vide les suggestions si l'input est vide
-  if (searchValue === '') {
-    suggestionsDiv.innerHTML = '';
-    suggestionsDiv.style.display = 'none';
-    return;
-  }
+  const filtered = allItems.filter(i => i.toLowerCase().includes(q) && !guessedNames.has(i));
+  if (filtered.length === 0) return hideSuggestions();
 
-  // Filtre les items qui correspondent à la recherche ET qui ne sont pas dans wrongGuesses
-  const filtered = allItems.filter(item =>
-    item.toLowerCase().includes(searchValue) && !wrongGuesses.includes(item)
-  );
+  filtered.slice(0, 10).forEach(name => {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
 
-  // Limite à 10 suggestions maximum
-  const suggestions = filtered.slice(0, 10);
+    // Create mini icon
+    const img = document.createElement('img');
+    console.log(items)
+    img.src = iconUrl192(items[name].Icon || name);
+    img.alt = name;
+    img.style.width = '24px';
+    img.style.height = '24px';
+    img.style.marginRight = '8px';
+    img.style.verticalAlign = 'middle';
+    img.style.objectFit = 'contain';
+    div.appendChild(img);
 
-  // Affiche les suggestions
-  if (suggestions.length > 0) {
-    suggestionsDiv.innerHTML = suggestions
-      .map(item => `<div class="suggestion-item">${item}</div>`)
-      .join('');
-    suggestionsDiv.style.display = 'block';
+    // Add name text
+    const span = document.createElement('span');
+    span.textContent = name;
+    div.appendChild(span);
 
-    // Ajoute les événements de clic sur chaque suggestion
-    const suggestionItems = suggestionsDiv.querySelectorAll('.suggestion-item');
-    suggestionItems.forEach(item => {
-      item.addEventListener('click', () => {
-        input.value = item.textContent;
-        suggestionsDiv.innerHTML = '';
-        suggestionsDiv.style.display = 'none';
-      });
+    // Click selects the item
+    div.addEventListener('click', () => {
+      input.value = name;
+      hideSuggestions();
+      submitGuess();
     });
-  } else {
-    suggestionsDiv.innerHTML = '';
-    suggestionsDiv.style.display = 'none';
-  }
-}
 
+    suggestionsDiv.appendChild(div);
+  });
+
+  suggestionsDiv.style.display = 'block';
+}
 // Fonction pour mettre à jour l'affichage des attempts
 function updateAttemptsDisplay() {
   const attemptsElement = document.getElementById('splash-attempts');
@@ -130,8 +156,8 @@ async function addGuessToDisplay(itemName, isCorrect) {
   // Récupère les données pour obtenir l'icône
   try {
     const response = await fetch('datas.json');
-    const datas = await response.json();
-    const itemData = datas[itemName];
+    items = await response.json();
+    const itemData = items[itemName];
 
     if (!itemData) {
       console.error('Item non trouvé dans les données:', itemName);
@@ -144,7 +170,7 @@ async function addGuessToDisplay(itemName, isCorrect) {
 
     // Construit l'URL de l'image
     const iconName = itemData.icon.replace(/ /g, '_');
-    const imageUrl = `https://peak.wiki.gg/images/thumb/${iconName}.png/192px-${iconName}.png`;
+    const imageUrl = iconUrl64(iconName);
 
     // Icône et couleur selon le résultat
     const resultIcon = isCorrect ? '✓' : '✗';
@@ -232,7 +258,7 @@ function initAutocomplete() {
 
   // Événement input pour afficher les suggestions en temps réel
   input.addEventListener('input', () => {
-    showSuggestions(input, suggestionsDiv);
+    showSuggestions();
   });
 
   // Ferme les suggestions si on clique ailleurs
