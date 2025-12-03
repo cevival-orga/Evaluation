@@ -214,11 +214,11 @@
 
         <div class="game-mode">
           <div class="game-info">
-            <p>Identify the Peak level from the splash art!</p>
-            <div class="attempts">
-              <span
-                >Attempts:
-                <strong><span id="splash-attempts">0</span>/6</strong></span
+            <p>Identify the Peak item from the sprite!</p>
+            <div class="lives">
+              Lives: <strong id="splash-lives">7</strong>/7
+              <span id="splash-lives-hearts" style="margin-left: 8px"
+                >❤️❤️❤️❤️❤️❤️❤️</span
               >
             </div>
           </div>
@@ -262,9 +262,10 @@
               <h2 id="splash-result-title"></h2>
               <p id="splash-result-message"></p>
               <div class="result-stats">
-                <p>Attempts: <strong id="splash-result-attempts"></strong></p>
+                <p>
+                  Lives remaining: <strong id="splash-result-lives"></strong>
+                </p>
               </div>
-              <button id="splash-share" class="share-btn">Share Results</button>
               <button
                 id="splash-play-again"
                 class="play-again-btn"
