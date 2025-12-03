@@ -106,7 +106,7 @@ function showSuggestions(input, suggestionsDiv) {
   // Affiche les suggestions
   if (suggestions.length > 0) {
     suggestionsDiv.innerHTML = suggestions
-      .map((item) => `<div class="suggestion-item"><img style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(item)}" alt="${item}" class="guess-img">${item}</div>`)
+      .map((item) => `<div class="suggestion-item"><img style="margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(item)}" alt="${item}" class="guess-img">${item}</div>`)
       .join("");
     suggestionsDiv.style.display = "block";
 

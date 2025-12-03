@@ -461,3 +461,5 @@ function showSuggestions() {
 
   submitBtn.addEventListener("click", submitGuess);
 })();
+}})
+
