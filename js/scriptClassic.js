@@ -217,6 +217,7 @@ function createDefeatParticles() {
 
 (async () => {
   const DATA_FILE = "datas.json";
+  const CHOICE_FILE = "daily.json";
   const MAX_LIVES = 7;
 
   let items = {},
@@ -427,6 +428,9 @@ function createDefeatParticles() {
   // --- load data ---
   try {
     const res = await fetch(DATA_FILE);
+    const resChoice = await fetch(CHOICE_FILE);
+    const choice = await resChoice.json();
+    targetName = choice["classic"];
     if (!res.ok) throw new Error("Failed to load " + DATA_FILE);
     items = await res.json();
     allItems = Object.keys(items);
@@ -438,7 +442,6 @@ function createDefeatParticles() {
 
   // choose target
   const allNames = Object.keys(items);
-  targetName = allNames[Math.floor(Math.random() * allNames.length)];
   targetItem = items[targetName];
   console.log("CLASSIC TARGET:", targetName, targetItem);
 
@@ -472,6 +475,7 @@ function createDefeatParticles() {
 
 (async () => {
   const DATA_FILE = "datas notes.json";
+  const CHOICE_FILE = "daily.json";
   const MAX_LIVES = 7;
 
 
@@ -663,6 +667,9 @@ readTextFile("config.json", function(text){
   // Load data
   try {
     const res = await fetch(DATA_FILE);
+    const resChoice = await fetch(CHOICE_FILE);
+    const choice = await resChoice.json();
+    targetName = choice["detective"];
     items = await res.json();
     allItems = Object.keys(items);
   } catch (err) {
@@ -672,7 +679,6 @@ readTextFile("config.json", function(text){
 
   // Select target
   const names = Object.keys(items);
-  targetName = names[Math.floor(Math.random() * names.length)];
   targetItem = items[targetName];
 
   clueOriginal = targetItem.Notes || "No notes available.";

@@ -74,24 +74,22 @@ async function getRandomItemImageUrl() {
   try {
     const response = await fetch("datas.json");
     const datas = await response.json();
+    const resChoice = await fetch("daily.json")
+    const data_choice = await resChoice.json();
 
-    // Récupère tous les noms d'items
-    const itemNames = Object.keys(datas);
-
-    // Sélectionne un item aléatoire
-    const randomIndex = Math.floor(Math.random() * itemNames.length);
-    const randomItemName = itemNames[randomIndex];
+    // Charge l'item depuis daily.kson
+    const ItemName = data_choice['splash'];
 
     // Stocke l'item actuel
     currentItem = {
-      name: randomItemName,
-      data: datas[randomItemName],
+      name: ItemName,
+      data: datas[ItemName],
     };
 
     // Retourne l'objet avec le nom et l'URL
-    const iconName = datas[randomItemName].icon.replace(/ /g, "_");
+    const iconName = datas[ItemName].icon.replace(/ /g, "_");
     return {
-      item: randomItemName,
+      item: ItemName,
       url: iconUrl192(iconName),
     };
   } catch (error) {
