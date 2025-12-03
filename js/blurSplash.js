@@ -1,23 +1,72 @@
 // Variables globales
-let blurAmount = 25; // flou initial
+let pixelSize = 32; // taille des pixels (plus grand = plus pixelisé)
 const MAX_LIVES = 7;
 let lives = MAX_LIVES;
 let itemImg = null;
+let pixelCanvas = null;
+let pixelCtx = null;
+let originalImage = null;
 let currentItem = null;
 let currentItemName = null;
 let allItems = []; // Liste de tous les items pour l'autocomplétion
 let wrongGuesses = []; // Liste des mauvaises réponses
 
 function iconUrl64(iconName) {
-    if (!iconName) return ''; 
-    const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
-    return `images/64px-images/64px-${fileName}.webp`;
+  if (!iconName) return "";
+  const fileName = String(iconName).replace(/ /g, "_"); // replace spaces
+  return `images/64px-images/64px-${fileName}.webp`;
 }
 
 function iconUrl192(iconName) {
-    if (!iconName) return ''; 
-    const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
-    return `images/192px-images/192px-${fileName}.webp`;
+  if (!iconName) return "";
+  const fileName = String(iconName).replace(/ /g, "_"); // replace spaces
+  return `images/192px-images/192px-${fileName}.webp`;
+}
+
+// Fonction pour pixeliser une image
+function pixelateImage(pixelationLevel) {
+  if (!pixelCanvas || !pixelCtx || !originalImage) return;
+
+  const width = pixelCanvas.width;
+  const height = pixelCanvas.height;
+
+  // Efface le canvas
+  pixelCtx.clearRect(0, 0, width, height);
+
+  if (pixelationLevel <= 1) {
+    // Pas de pixelisation, affiche l'image normale
+    pixelCtx.imageSmoothingEnabled = true;
+    pixelCtx.drawImage(originalImage, 0, 0, width, height);
+    return;
+  }
+
+  // Dessine l'image en petite taille puis la redimensionne pour l'effet pixel
+  const smallWidth = Math.max(1, Math.floor(width / pixelationLevel));
+  const smallHeight = Math.max(1, Math.floor(height / pixelationLevel));
+
+  // Utiliser un canvas offscreen pour éviter un petit rendu en haut à gauche
+  const offscreen = document.createElement("canvas");
+  offscreen.width = smallWidth;
+  offscreen.height = smallHeight;
+  const octx = offscreen.getContext("2d");
+  octx.imageSmoothingEnabled = false;
+
+  // Dessiner l'image originale réduite dans l'offscreen
+  octx.drawImage(originalImage, 0, 0, smallWidth, smallHeight);
+
+  // Désactiver le lissage et peindre l'offscreen étiré sur le canvas principal
+  pixelCtx.imageSmoothingEnabled = false;
+  pixelCtx.drawImage(
+    offscreen,
+    0,
+    0,
+    smallWidth,
+    smallHeight,
+    0,
+    0,
+    width,
+    height
+  );
 }
 
 // Fonction pour charger et choisir un item aléatoire
@@ -52,23 +101,22 @@ async function getRandomItemImageUrl() {
 }
 
 // Fonction pour charger une image aléatoire dans l'élément splash-image
-async function loadRandomImage(imgElement) {
-  if (!imgElement) {
-    console.error("Élément splash-image non trouvé");
-    return;
-  }
-
+async function loadRandomImage() {
   const result = await getRandomItemImageUrl();
 
   if (result) {
     // Stocke le nom de l'item
     currentItemName = result.item;
 
-    // Met l'URL de l'image dans l'élément img
-    imgElement.src = result.url;
-    imgElement.alt = result.item;
-
-    console.log("Image chargée:", result.item);
+    // Charge l'image originale
+    originalImage = new Image();
+    originalImage.crossOrigin = "anonymous";
+    originalImage.onload = function () {
+      // Applique la pixelisation initiale
+      pixelateImage(pixelSize);
+      console.log("Image chargée et pixelisée:", result.item);
+    };
+    originalImage.src = result.url;
   }
 }
 
@@ -106,7 +154,12 @@ function showSuggestions(input, suggestionsDiv) {
   // Affiche les suggestions
   if (suggestions.length > 0) {
     suggestionsDiv.innerHTML = suggestions
-      .map((item) => `<div class="suggestion-item"><img style="margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(item)}" alt="${item}" class="guess-img">${item}</div>`)
+      .map(
+        (item) =>
+          `<div class="suggestion-item"><img style="margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(
+            item
+          )}" alt="${item}" class="guess-img">${item}</div>`
+      )
       .join("");
     suggestionsDiv.style.display = "block";
 
@@ -136,6 +189,42 @@ function updateLivesDisplay() {
     livesHearts.textContent =
       "❤️".repeat(Math.max(0, lives)) +
       "🤍".repeat(Math.max(0, MAX_LIVES - lives));
+  }
+}
+
+// Fonction pour créer des confettis de victoire
+function createConfetti() {
+  const emojis = ["🎉", "✨", "🎊", "🎆", "👏", "🎁"];
+  const confettiCount = 40;
+
+  for (let i = 0; i < confettiCount; i++) {
+    const confetti = document.createElement("div");
+    confetti.className = "confetti";
+    confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    confetti.style.left = Math.random() * 100 + "vw";
+    confetti.style.animationDelay = Math.random() * 0.3 + "s";
+    confetti.style.animationDuration = Math.random() * 2 + 2 + "s";
+    document.body.appendChild(confetti);
+
+    setTimeout(() => confetti.remove(), 4000);
+  }
+}
+
+// Fonction pour créer des particules de défaite
+function createDefeatParticles() {
+  const emojis = ["💀", "💔", "😭", "⚠️"];
+  const particleCount = 25;
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "defeat-particle";
+    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    particle.style.left = Math.random() * 100 + "vw";
+    particle.style.animationDelay = Math.random() * 0.5 + "s";
+    particle.style.animationDuration = Math.random() * 1.5 + 2 + "s";
+    document.body.appendChild(particle);
+
+    setTimeout(() => particle.remove(), 3500);
   }
 }
 
@@ -206,10 +295,8 @@ function checkAnswer() {
 
   // Vérifie si la réponse est correcte
   if (guess === currentItemName) {
-    // Bonne réponse
-    if (itemImg) {
-      itemImg.style.filter = "blur(0px)";
-    }
+    // Bonne réponse - révèle l'image complètement
+    pixelateImage(1);
     addGuessToDisplay(guess, true);
 
     // Affiche la modal de victoire
@@ -219,12 +306,16 @@ function checkAnswer() {
     const resultLives = document.getElementById("splash-result-lives");
 
     if (resultModal && resultTitle && resultMessage && resultLives) {
-      resultTitle.textContent = "🎉 Correct!";
+      resultTitle.innerHTML =
+        '<span style="font-size: 3rem;">🎉</span><br>Correct!';
       resultMessage.textContent = `The item was ${currentItemName}.`;
       resultLives.textContent = String(lives);
       resultModal.classList.remove("hidden");
-    }
+      resultModal.classList.add("victory");
 
+      // Lance les confettis de victoire
+      createConfetti();
+    }
     input.disabled = true;
     if (submitBtn) submitBtn.disabled = true;
     console.log("🎉 Bravo ! Tu as trouvé le bon item : " + currentItemName);
@@ -237,21 +328,22 @@ function checkAnswer() {
     lives = Math.max(0, lives - 1);
     updateLivesDisplay();
 
-    // Calcule le flou en fonction des vies perdues (25px -> 0px en 7 vies)
+    // Calcule la pixelisation en fonction des vies perdues (32 -> 4 en 7 vies pour max difficulté)
     const livesLost = MAX_LIVES - lives;
-    blurAmount = 25 - livesLost * (25 / MAX_LIVES);
+    pixelSize = Math.max(4, Math.floor(32 - livesLost * (28 / MAX_LIVES)));
 
     if (lives > 0) {
-      // Il reste des vies
-      if (itemImg) {
-        itemImg.style.filter = `blur(${blurAmount}px)`;
-      }
-      console.log("❌ Mauvaise réponse ! Il te reste " + lives + " vie(s)");
+      // Il reste des vies - dé-pixelise progressivement
+      pixelateImage(pixelSize);
+      console.log(
+        "❌ Mauvaise réponse ! Il te reste " +
+          lives +
+          " vie(s). Pixel size: " +
+          pixelSize
+      );
     } else {
-      // Plus de vies
-      if (itemImg) {
-        itemImg.style.filter = "blur(0px)";
-      }
+      // Plus de vies - révèle complètement
+      pixelateImage(1);
 
       // Affiche la modal de défaite
       const resultModal = document.getElementById("splash-result");
@@ -260,12 +352,16 @@ function checkAnswer() {
       const resultLives = document.getElementById("splash-result-lives");
 
       if (resultModal && resultTitle && resultMessage && resultLives) {
-        resultTitle.textContent = "💀 Out of lives!";
+        resultTitle.innerHTML =
+          '<span style="font-size: 3rem;">💀</span><br>Out of lives!';
         resultMessage.textContent = `The item was ${currentItemName}.`;
         resultLives.textContent = String(lives);
         resultModal.classList.remove("hidden");
-      }
+        resultModal.classList.add("defeat");
 
+        // Lance les particules de défaite
+        createDefeatParticles();
+      }
       input.disabled = true;
       if (submitBtn) submitBtn.disabled = true;
       console.log(
@@ -307,13 +403,41 @@ function initAutocomplete() {
   });
 }
 
-// Fonction pour initialiser le blur
+// Fonction pour initialiser le mode pixelisé
 function initBlur() {
-  // Récupère ton élément image
+  // Récupère le conteneur d'image et crée un canvas à la place
+  const imageContainer = document.querySelector(
+    "#splash-page .image-container"
+  );
   itemImg = document.getElementById("splash-image");
 
+  if (!imageContainer) {
+    console.error("Conteneur d'image non trouvé");
+    return;
+  }
+
+  // Cache l'image originale
+  if (itemImg) {
+    itemImg.style.display = "none";
+  }
+
+  // Crée un canvas pour la pixelisation s'il n'existe pas déjà
+  pixelCanvas = document.getElementById("splash-canvas");
+  if (!pixelCanvas) {
+    pixelCanvas = document.createElement("canvas");
+    pixelCanvas.id = "splash-canvas";
+    pixelCanvas.width = 192;
+    pixelCanvas.height = 192;
+    pixelCanvas.style.width = "100%";
+    pixelCanvas.style.height = "100%";
+    pixelCanvas.style.objectFit = "contain";
+    pixelCanvas.style.imageRendering = "pixelated";
+    imageContainer.appendChild(pixelCanvas);
+  }
+  pixelCtx = pixelCanvas.getContext("2d");
+
   // Réinitialise les variables
-  blurAmount = 25;
+  pixelSize = 32;
   lives = MAX_LIVES;
   wrongGuesses = [];
   updateLivesDisplay();
@@ -324,11 +448,14 @@ function initBlur() {
     guessesContainer.innerHTML = "";
   }
 
-  // Ajout de l'image
-  loadRandomImage(itemImg);
+  // Ajout de l'image pixelisée
+  loadRandomImage();
 
-  // Applique le flou initial
-  itemImg.style.filter = `blur(${blurAmount}px)`;
+  // Cache l'overlay de flou (plus nécessaire)
+  const blurOverlay = document.getElementById("splash-blur");
+  if (blurOverlay) {
+    blurOverlay.style.display = "none";
+  }
 
   // Ajoute l'écouteur d'événement pour le bouton submit
   const submitBtn = document.getElementById("splash-submit");
@@ -363,25 +490,21 @@ function initBlur() {
   initAutocomplete();
 }
 
-// Fonction appelée à chaque essai raté (ancienne version, plus utilisée)
+// Fonction appelée à chaque essai raté (ancienne version, pour compatibilité)
 function handleWrongGuess() {
-  if (!itemImg) return;
-
-  // Calcule le flou en fonction des vies perdues (25px -> 0px en 7 vies)
   const livesLost = MAX_LIVES - lives;
-  blurAmount = 25 - livesLost * (25 / MAX_LIVES);
-  itemImg.style.filter = `blur(${blurAmount}px)`;
+  pixelSize = Math.max(4, Math.floor(32 - livesLost * (28 / MAX_LIVES)));
+  pixelateImage(pixelSize);
 
   // Si plus de vies, révèle complètement
   if (lives <= 0) {
-    itemImg.style.filter = "blur(0px)";
+    pixelateImage(1);
   }
 }
 
 // Fonction appelée si bonne réponse
 function handleCorrectGuess() {
-  if (!itemImg) return;
-  itemImg.style.filter = "blur(0px)"; // révèle immédiatement
+  pixelateImage(1); // révèle immédiatement
   if (typeof showSuccess === "function") {
     showSuccess();
   }
