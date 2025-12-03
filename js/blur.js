@@ -8,6 +8,18 @@ let currentItemName = null;
 let allItems = []; // Liste de tous les items pour l'autocomplétion
 let wrongGuesses = []; // Liste des mauvaises réponses
 
+function iconUrl64(iconName) {
+    if (!iconName) return ''; 
+    const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
+    return `images/64px-images/64px-${fileName}.webp`;
+}
+
+function iconUrl192(iconName) {
+    if (!iconName) return ''; 
+    const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
+    return `images/192px-images/192px-${fileName}.webp`;
+}
+
 // Fonction pour charger et choisir un item aléatoire
 async function getRandomItemImageUrl() {
   try {
@@ -31,7 +43,7 @@ async function getRandomItemImageUrl() {
     const iconName = datas[randomItemName].icon.replace(/ /g, "_");
     return {
       item: randomItemName,
-      url: `https://peak.wiki.gg/images/thumb/${iconName}.png/192px-${iconName}.png`,
+      url: iconUrl192(iconName),
     };
   } catch (error) {
     console.error("Erreur lors du chargement des données:", error);
@@ -94,7 +106,7 @@ function showSuggestions(input, suggestionsDiv) {
   // Affiche les suggestions
   if (suggestions.length > 0) {
     suggestionsDiv.innerHTML = suggestions
-      .map((item) => `<div class="suggestion-item">${item}</div>`)
+      .map((item) => `<div class="suggestion-item"><img style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(item)}" alt="${item}" class="guess-img">${item}</div>`)
       .join("");
     suggestionsDiv.style.display = "block";
 
@@ -149,7 +161,7 @@ async function addGuessToDisplay(itemName, isCorrect) {
 
     // Construit l'URL de l'image
     const iconName = itemData.icon.replace(/ /g, "_");
-    const imageUrl = `https://peak.wiki.gg/images/thumb/${iconName}.png/192px-${iconName}.png`;
+    const imageUrl = iconUrl64(iconName);
 
     // Icône et couleur selon le résultat
     const resultIcon = isCorrect ? "✓" : "✗";
