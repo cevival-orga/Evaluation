@@ -1329,3 +1329,110 @@ footer {
     transform: rotate(360deg);
   }
 }
+
+/* --- Classic Mode local styles --- */
+/* Classic guesses container */
+/* CSS for guesses container */
+#classic-guesses {
+  display: flex;
+  flex-direction: column; /* stack rows vertically */
+  gap: 8px;
+}
+#classic-page .guess-row {
+  display: flex; /* squares in a row */
+  align-items: center;
+  gap: 8px;
+}
+#classic-page .square {
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+}
+
+/* Icon stays fixed size */
+#classic-page .guess-row img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0; /* icon doesn't shrink */
+}
+/* CSS for guesses container */
+#classic-guesses {
+  display: flex;
+  flex-direction: column; /* stack rows vertically */
+  gap: 8px;
+}
+#classic-page .guess-row {
+  display: flex; /* squares in a row */
+  align-items: center;
+  gap: 8px;
+}
+#classic-page .square {
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+}
+
+
+    #classic-page .green { background:#1e7a1e; color:white; }
+    #classic-page .yellow { background:#d4b100; color:#111; }
+    #classic-page .red { background:#8b0000; color:white; }
+
+    /* Input area - full width row */
+    #classic-page .input-area {
+      width:100%;
+      max-width: 1000px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-top:12px;
+      position:relative; /* suggestions appear below */
+    }
+    /* input fills remaining space, button at right */
+    #classic-page .input-area #classic-input {
+      flex:1 1 auto;
+      padding:10px 12px;
+      font-size:16px;
+      border:1px solid #ccc;
+      border-radius:8px;
+    }
+    #classic-page .input-area {
+      opacity:0.6;
+    }
+
+    /* splash-mode suggestion markup used in your site: plain .suggestion-item with no images */
+    .suggestion-item {
+      padding: 8px 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #efefef;
+      font-size: 15px;
+    }
+    .suggestion-item:hover {
+      background: #f6f8fb;
+    }
+
+    /* small screens: stack button under input */
+    @media (max-width: 540px) {
+      #classic-page .input-area { flex-direction: column; align-items: stretch; }
+      #classic-page .input-area { width: 100%; flex: 0 0 auto; }
+    }
+
+    #classic-page .guesses-container { margin-top:12px; }
+    #classic-page .lives { margin-top:8px; font-Weight:700; }
