@@ -45,18 +45,14 @@
           <div class="game-card" data-game="classic">
             <div class="game-icon">🎯</div>
             <h2>Classic Mode</h2>
-            <p>
-              Guess the Item in the classic WORDLE format !
-            </p>
+            <p>Guess the Item in the classic WORDLE format !</p>
             <button class="play-btn" data-page="classic">Play Classic</button>
           </div>
 
           <div class="game-card" data-game="splash">
             <div class="game-icon">🎨</div>
             <h2>Splash Mode</h2>
-            <p>
-              Identify the Item from its blurred sprite !
-            </p>
+            <p>Identify the Item from its blurred sprite !</p>
             <button class="play-btn" data-page="splash">Play Splash</button>
           </div>
         </div>
@@ -68,56 +64,74 @@
         </div>
       </section>
 
-<!-- CLASSIC MODE PAGE (updated: full-width input+button, Splash-mode autocomplete visuals) -->
-<section id="classic-page" class="page">
-  <div class="page-header">
-    <button class="back-btn" data-page="home">← Back</button>
-    <h2>🎯 Classic Mode</h2>
-  </div>
-
-  <div class="game-mode">
-    <div class="game-info">
-      <p>Guess the Peak item!</p>
-      <div class="lives">
-        Lives: <strong id="classic-lives">7</strong>/7
-        <span id="classic-lives-hearts" style="margin-left:8px;">❤️❤️❤️❤️❤️❤️❤️</span>
-      </div>
-    </div>
-
-    <!-- Input Area + Autocomplete (fills the whole row) -->
-    <div class="input-area">
-      <input
-        type="text"
-        id="classic-input"
-        class="level-input"
-        placeholder="Enter item name..."
-        autocomplete="off"
-      />
-      <button id="classic-submit" class="submit-btn">Guess</button>
-
-      <!-- Autocomplete dropdown (Splash-style visuals) -->
-    </div>
-    <div id="classic-suggestions" class="suggestions-dropdown"></div>
-
-    <!-- Guesses List -->
-    <div class="guesses-container">
-      <h3>Your Guesses:</h3>
-      <div id="classic-guesses" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;"></div>
-    </div>
-
-    <!-- Result Modal -->
-    <div id="classic-result" class="result-modal hidden">
-      <div class="result-content">
-        <h2 id="classic-result-title"></h2>
-        <p id="classic-result-message"></p>
-        <div class="result-stats">
-          <p>Lives remaining: <strong id="classic-result-lives"></strong></p>
+      <!-- CLASSIC MODE PAGE (updated: full-width input+button, Splash-mode autocomplete visuals) -->
+      <section id="classic-page" class="page">
+        <div class="page-header">
+          <button class="back-btn" data-page="home">← Back</button>
+          <h2>🎯 Classic Mode</h2>
         </div>
-        <button id="classic-play-again" class="play-again-btn" data-page="home">Back to Home</button>
-      </div>
-    </div>
-  </div>
-</section>
+
+        <div class="game-mode">
+          <div class="game-info">
+            <p>Guess the Peak item!</p>
+            <div class="lives">
+              Lives: <strong id="classic-lives">7</strong>/7
+              <span id="classic-lives-hearts" style="margin-left: 8px"
+                >❤️❤️❤️❤️❤️❤️❤️</span
+              >
+            </div>
+          </div>
+
+          <!-- Input Area + Autocomplete (fills the whole row) -->
+          <div class="input-area">
+            <input
+              type="text"
+              id="classic-input"
+              class="level-input"
+              placeholder="Enter item name..."
+              autocomplete="off"
+            />
+            <button id="classic-submit" class="submit-btn">Guess</button>
+
+            <!-- Autocomplete dropdown (Splash-style visuals) -->
+          </div>
+          <div id="classic-suggestions" class="suggestions-dropdown"></div>
+
+          <!-- Guesses List -->
+          <div class="guesses-container">
+            <h3>Your Guesses:</h3>
+            <div
+              id="classic-guesses"
+              style="
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                padding-bottom: 4px;
+              "
+            ></div>
+          </div>
+
+          <!-- Result Modal -->
+          <div id="classic-result" class="result-modal hidden">
+            <div class="result-content">
+              <h2 id="classic-result-title"></h2>
+              <p id="classic-result-message"></p>
+              <div class="result-stats">
+                <p>
+                  Lives remaining: <strong id="classic-result-lives"></strong>
+                </p>
+              </div>
+              <button
+                id="classic-play-again"
+                class="play-again-btn"
+                data-page="home"
+              >
+                Back to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
       <!-- CLASSIC MODE PAGE -->
       <section id="classic-page" class="page">
         <div class="page-header">
@@ -200,11 +214,11 @@
 
         <div class="game-mode">
           <div class="game-info">
-            <p>Identify the Peak level from the splash art!</p>
-            <div class="attempts">
-              <span
-                >Attempts:
-                <strong><span id="splash-attempts">0</span>/6</strong></span
+            <p>Identify the Peak item from the sprite!</p>
+            <div class="lives">
+              Lives: <strong id="splash-lives">7</strong>/7
+              <span id="splash-lives-hearts" style="margin-left: 8px"
+                >❤️❤️❤️❤️❤️❤️❤️</span
               >
             </div>
           </div>
@@ -248,9 +262,10 @@
               <h2 id="splash-result-title"></h2>
               <p id="splash-result-message"></p>
               <div class="result-stats">
-                <p>Attempts: <strong id="splash-result-attempts"></strong></p>
+                <p>
+                  Lives remaining: <strong id="splash-result-lives"></strong>
+                </p>
               </div>
-              <button id="splash-share" class="share-btn">Share Results</button>
               <button
                 id="splash-play-again"
                 class="play-again-btn"

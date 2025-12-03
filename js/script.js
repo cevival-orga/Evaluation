@@ -97,6 +97,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // Play again buttons click (in result modals)
+  const playAgainButtons = document.querySelectorAll(".play-again-btn");
+  playAgainButtons.forEach((button) => {
+    button.addEventListener("click", function (e) {
+      e.preventDefault();
+      // Refresh the page when going back to home
+      location.reload();
+    });
+  });
+
   // Logo nav-brand click (Home)
   if (navHome) {
     navHome.addEventListener("click", function (e) {
@@ -157,9 +167,102 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("Ready to climb!");
 });
 
+(async () => {
+  const DATA_FILE = "datas.json";
+  const MAX_LIVES = 7;
 
+  let items = {},
+    targetName = "",
+    targetItem = null;
+  const guessedNames = new Set();
+  let lives = MAX_LIVES;
+  let allItems = [];
 
+  const input = document.getElementById("classic-input");
+  const submitBtn = document.getElementById("classic-submit");
+  const suggestionsDiv = document.getElementById("classic-suggestions");
+  const guessesList = document.getElementById("classic-guesses");
+  const livesSpan = document.getElementById("classic-lives");
+  const livesHearts = document.getElementById("classic-lives-hearts");
+  const resultModal = document.getElementById("classic-result");
+  const resultTitle = document.getElementById("classic-result-title");
+  const resultMessage = document.getElementById("classic-result-message");
+  const resultLives = document.getElementById("classic-result-lives");
 
+  // Helper: build icon URL (kept for guess rows)
+  function iconUrl(iconName) {
+    return `https://peak.wiki.gg/images/thumb/${String(iconName).replace(
+      / /g,
+      "_"
+    )}.png/64px-${String(iconName).replace(/ /g, "_")}.png`;
+  }
+
+  function updateLivesDisplay() {
+    livesSpan.textContent = lives;
+    livesHearts.textContent =
+      "❤️".repeat(Math.max(0, lives)) +
+      "🤍".repeat(Math.max(0, MAX_LIVES - lives));
+  }
+
+  function compareValues(key, guessValue, targetValue) {
+    if (typeof targetValue === "undefined") return "red";
+    if (key === "Weight")
+      return Number(guessValue) === Number(targetValue) ? "green" : "red";
+    if (key === "Uses") return guessValue === targetValue ? "green" : "red";
+
+    const gVals = Array.isArray(guessValue) ? guessValue : [guessValue];
+    const tVals = Array.isArray(targetValue) ? targetValue : [targetValue];
+    const gNorm = gVals.map((v) => String(v));
+    const tNorm = tVals.map((v) => String(v));
+    const intersection = gNorm.filter((v) => tNorm.includes(v));
+    if (intersection.length === 0) return "red";
+    if (intersection.length < Math.max(gNorm.length, tNorm.length))
+      return "yellow";
+    return "green";
+  }
+  function addGuessRow(name) {
+    const guessedItem = items[name];
+    if (!guessedItem) return;
+
+    const row = document.createElement("div");
+    row.className = "guess-row";
+
+    // Icon on the left
+    const img = document.createElement("img");
+    img.src = iconUrl(guessedItem.Icon || guessedItem.icon || name);
+    img.alt = name;
+    row.appendChild(img);
+
+    const pref = ["Type", "Rarity", "Weight", "Effects", "Uses"];
+    const keys = Object.keys(guessedItem)
+      .map((k) => k.charAt(0).toUpperCase() + k.slice(1))
+      .filter((k) => k !== "Icon");
+    const ordered = [];
+    for (const k of pref) if (keys.includes(k)) ordered.push(k);
+    for (const k of keys) if (!ordered.includes(k)) ordered.push(k);
+
+    for (const key of ordered) {
+      const value = guessedItem[key] ?? guessedItem[key.toLowerCase()]; // allow 0
+      const targetValue = targetItem[key] ?? targetItem[key.toLowerCase()]; // allow 0
+      const colorClass = compareValues(key, value, targetValue);
+
+      let display = Array.isArray(value) ? value.join(", ") : String(value);
+
+      if (key === "Weight" && targetValue !== undefined) {
+        const gNum = Number(value),
+          tNum = Number(targetValue);
+        if (!Number.isNaN(gNum) && !Number.isNaN(tNum)) {
+          if (gNum === tNum) display = `${value} ✓`;
+          else if (gNum < tNum) display = `${value} ▲`;
+          else display = `${value} ▼`;
+        }
+      }
+
+      const sq = document.createElement("div");
+      sq.className = "square " + colorClass;
+      sq.textContent = `${key}:\n${display}`;
+      row.appendChild(sq);
+    }
 
 (async () => {
       const DATA_FILE = 'datas.json';
@@ -188,75 +291,65 @@ document.addEventListener("DOMContentLoaded", function () {
         return `images/64px-images/64px-${fileName}.webp`;
         }
 
-      function updateLivesDisplay() {
-        livesSpan.textContent = lives;
-        livesHearts.textContent = '❤️'.repeat(Math.max(0, lives)) + '🤍'.repeat(Math.max(0, MAX_LIVES - lives));
-      }
-
-      function compareValues(key, guessValue, targetValue) {
-        if (typeof targetValue === 'undefined') return 'red';
-        if (key === 'Weight') return Number(guessValue) === Number(targetValue) ? 'green' : 'red';
-        if (key === 'Uses') return guessValue === targetValue ? 'green' : 'red';
-
-        const gVals = Array.isArray(guessValue) ? guessValue : [guessValue];
-        const tVals = Array.isArray(targetValue) ? targetValue : [targetValue];
-        const gNorm = gVals.map(v => String(v));
-        const tNorm = tVals.map(v => String(v));
-        const intersection = gNorm.filter(v => tNorm.includes(v));
-        if (intersection.length === 0) return 'red';
-        if (intersection.length < Math.max(gNorm.length, tNorm.length)) return 'yellow';
-        return 'green';
-      }
-function addGuessRow(name) {
-  const guessedItem = items[name];
-  if (!guessedItem) return;
-
-  const row = document.createElement('div');
-  row.className = 'guess-row';
-
-  // Icon on the left
-  const img = document.createElement('img');
-  img.src = iconUrl(guessedItem.Icon || guessedItem.icon || name);
-  img.alt = name;
-  row.appendChild(img);
-
-  const pref = ['Type','Rarity','Weight','Effects','Uses'];
-  const keys = Object.keys(guessedItem).map(k => k.charAt(0).toUpperCase() + k.slice(1))
-               .filter(k => k !== 'Icon');
-  const ordered = [];
-  for (const k of pref) if (keys.includes(k)) ordered.push(k);
-  for (const k of keys) if (!ordered.includes(k)) ordered.push(k);
-
-  for (const key of ordered) {
-    const value = guessedItem[key] ?? guessedItem[key.toLowerCase()]; // allow 0
-    const targetValue = targetItem[key] ?? targetItem[key.toLowerCase()]; // allow 0
-    const colorClass = compareValues(key, value, targetValue);
-
-    let display = Array.isArray(value) ? value.join(', ') : String(value);
-
-    if (key === 'Weight' && targetValue !== undefined) {
-      const gNum = Number(value), tNum = Number(targetValue);
-      if (!Number.isNaN(gNum) && !Number.isNaN(tNum)) {
-        if (gNum === tNum) display = `${value} ✓`;
-        else if (gNum < tNum) display = `${value} ▲`;
-        else display = `${value} ▼`;
-      }
-    }
-
-    const sq = document.createElement('div');
-    sq.className = 'square ' + colorClass;
-    sq.textContent = `${key}:\n${display}`;
-    row.appendChild(sq);
+  /* Autocomplete exactly like Splash mode: suggestion-item plain text blocks */
+  function hideSuggestions() {
+    suggestionsDiv.style.display = "none";
+    suggestionsDiv.innerHTML = "";
   }
 
-  // Prepend to stack newest on top
-  guessesList.prepend(row);
-}
+  function showSuggestions() {
+    const q = input.value.trim().toLowerCase();
+    suggestionsDiv.innerHTML = "";
+    if (!q) return hideSuggestions();
 
-      /* Autocomplete exactly like Splash mode: suggestion-item plain text blocks */
-      function hideSuggestions() {
-        suggestionsDiv.style.display = 'none';
-        suggestionsDiv.innerHTML = '';
+    const filtered = allItems.filter(
+      (i) => i.toLowerCase().includes(q) && !guessedNames.has(i)
+    );
+    if (filtered.length === 0) return hideSuggestions();
+
+    filtered.slice(0, 10).forEach((name) => {
+      const div = document.createElement("div");
+      div.className = "suggestion-item";
+      // match Splash-mode visuals: plain text suggestion (no image)
+      div.textContent = name;
+      div.addEventListener("click", () => {
+        input.value = name;
+        hideSuggestions();
+        submitGuess();
+      });
+      suggestionsDiv.appendChild(div);
+    });
+
+    suggestionsDiv.style.display = "block";
+  }
+
+  function submitGuess() {
+    const guess = input.value.trim();
+    if (!guess) return;
+    if (input.disabled) return;
+
+    // correct
+    if (guess === targetName) {
+      resultTitle.textContent = "🎉 Correct!";
+      resultMessage.textContent = `The item was ${targetName}.`;
+      resultLives.textContent = String(lives);
+      resultModal.classList.remove("hidden");
+      input.disabled = true;
+      submitBtn.disabled = true;
+      hideSuggestions();
+      return;
+    }
+
+    // valid item
+    if (guess in items) {
+      if (guessedNames.has(guess)) {
+        resultMessage.textContent = `Already guessed "${guess}"`;
+        setTimeout(() => {
+          resultMessage.textContent = "";
+        }, 1400);
+        input.value = "";
+        showSuggestions();
+        return;
       }
 
 function showSuggestions() {
@@ -300,98 +393,71 @@ function showSuggestions() {
   suggestionsDiv.style.display = 'block';
 }
 
-      function submitGuess() {
-        const guess = input.value.trim();
-        if (!guess) return;
-        if (input.disabled) return;
-
-        // correct
-        if (guess === targetName) {
-          resultTitle.textContent = '🎉 Correct!';
-          resultMessage.textContent = `The item was ${targetName}.`;
-          resultLives.textContent = String(lives);
-          resultModal.classList.remove('hidden');
-          input.disabled = true;
-          submitBtn.disabled = true;
-          hideSuggestions();
-          return;
-        }
-
-        // valid item
-        if (guess in items) {
-          if (guessedNames.has(guess)) {
-            resultMessage.textContent = `Already guessed "${guess}"`;
-            setTimeout(() => { resultMessage.textContent = ''; }, 1400);
-            input.value = '';
-            showSuggestions();
-            return;
-          }
-
-          guessedNames.add(guess);
-          addGuessRow(guess);
-
-          // lose life
-          lives = Math.max(0, lives - 1);
-          updateLivesDisplay();
-
-          input.value = '';
-          hideSuggestions();
-
-          if (lives <= 0) {
-            resultTitle.textContent = '💀 Out of lives!';
-            resultMessage.textContent = `The item was ${targetName}.`;
-            resultLives.textContent = String(lives);
-            resultModal.classList.remove('hidden');
-            input.disabled = true;
-            submitBtn.disabled = true;
-          }
-          return;
-        }
-
-        // invalid
-        resultMessage.textContent = `Invalid guess: "${guess}"`;
-        setTimeout(() => { resultMessage.textContent = ''; }, 1200);
-        input.value = '';
-        showSuggestions();
-      }
-
-      // --- load data ---
-      try {
-        const res = await fetch(DATA_FILE);
-        if (!res.ok) throw new Error('Failed to load ' + DATA_FILE);
-        items = await res.json();
-        allItems = Object.keys(items);
-      } catch (err) {
-        console.error(err);
-        resultMessage.textContent = 'Error loading data';
-        return;
-      }
-
-      // choose target
-      const allNames = Object.keys(items);
-      targetName = allNames[Math.floor(Math.random() * allNames.length)];
-      targetItem = items[targetName];
-      console.log('CLASSIC TARGET:', targetName, targetItem);
-
-      // wire events
+      // lose life
+      lives = Math.max(0, lives - 1);
       updateLivesDisplay();
-      input.addEventListener('input', showSuggestions);
-      input.addEventListener('focus', showSuggestions);
 
-      // Enter selects top suggestion (Splash-mode behavior)
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const first = suggestionsDiv.querySelector('.suggestion-item');
-          if (first) input.value = first.textContent.trim();
-          hideSuggestions();
-          submitGuess();
-        }
-      });
+      input.value = "";
+      hideSuggestions();
 
-      document.addEventListener('click', (e) => {
-        if (!suggestionsDiv.contains(e.target) && e.target !== input) hideSuggestions();
-      });
+      if (lives <= 0) {
+        resultTitle.textContent = "💀 Out of lives!";
+        resultMessage.textContent = `The item was ${targetName}.`;
+        resultLives.textContent = String(lives);
+        resultModal.classList.remove("hidden");
+        input.disabled = true;
+        submitBtn.disabled = true;
+      }
+      return;
+    }
 
-      submitBtn.addEventListener('click', submitGuess);
-    })();
+    // invalid
+    resultMessage.textContent = `Invalid guess: "${guess}"`;
+    setTimeout(() => {
+      resultMessage.textContent = "";
+    }, 1200);
+    input.value = "";
+    showSuggestions();
+  }
+
+  // --- load data ---
+  try {
+    const res = await fetch(DATA_FILE);
+    if (!res.ok) throw new Error("Failed to load " + DATA_FILE);
+    items = await res.json();
+    allItems = Object.keys(items);
+  } catch (err) {
+    console.error(err);
+    resultMessage.textContent = "Error loading data";
+    return;
+  }
+
+  // choose target
+  const allNames = Object.keys(items);
+  targetName = allNames[Math.floor(Math.random() * allNames.length)];
+  targetItem = items[targetName];
+  console.log("CLASSIC TARGET:", targetName, targetItem);
+
+  // wire events
+  updateLivesDisplay();
+  input.addEventListener("input", showSuggestions);
+  input.addEventListener("focus", showSuggestions);
+
+  // Enter selects top suggestion (Splash-mode behavior)
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const first = suggestionsDiv.querySelector(".suggestion-item");
+      if (first) input.value = first.textContent.trim();
+      hideSuggestions();
+      submitGuess();
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!suggestionsDiv.contains(e.target) && e.target !== input)
+      hideSuggestions();
+  });
+
+  submitBtn.addEventListener("click", submitGuess);
+})();
