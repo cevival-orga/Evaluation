@@ -189,13 +189,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const resultMessage = document.getElementById("classic-result-message");
   const resultLives = document.getElementById("classic-result-lives");
 
-  // Helper: build icon URL (kept for guess rows)
-  function iconUrl(iconName) {
-    return `https://peak.wiki.gg/images/thumb/${String(iconName).replace(
-      / /g,
-      "_"
-    )}.png/64px-${String(iconName).replace(/ /g, "_")}.png`;
-  }
+    function iconUrl(iconName) {
+        if (!iconName) return ''; 
+        const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
+        return `images/64px-images/64px-${fileName}.webp`;
+    }
 
   function updateLivesDisplay() {
     livesSpan.textContent = lives;
@@ -264,32 +262,9 @@ document.addEventListener("DOMContentLoaded", function () {
       row.appendChild(sq);
     }
 
-(async () => {
-      const DATA_FILE = 'datas.json';
-      const MAX_LIVES = 7;
-
-      let items = {}, targetName = '', targetItem = null;
-      const guessedNames = new Set();
-      let lives = MAX_LIVES;
-      let allItems = [];
-
-      const input = document.getElementById('classic-input');
-      const submitBtn = document.getElementById('classic-submit');
-      const suggestionsDiv = document.getElementById('classic-suggestions');
-      const guessesList = document.getElementById('classic-guesses');
-      const livesSpan = document.getElementById('classic-lives');
-      const livesHearts = document.getElementById('classic-lives-hearts');
-      const resultModal = document.getElementById('classic-result');
-      const resultTitle = document.getElementById('classic-result-title');
-      const resultMessage = document.getElementById('classic-result-message');
-      const resultLives = document.getElementById('classic-result-lives');
-
-      // Helper: build icon URL (kept for guess rows)
-        function iconUrl(iconName) {
-        if (!iconName) return ''; 
-        const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
-        return `images/64px-images/64px-${fileName}.webp`;
-        }
+    // Prepend to stack newest on top
+    guessesList.prepend(row);
+  }
 
   /* Autocomplete exactly like Splash mode: suggestion-item plain text blocks */
   function hideSuggestions() {
@@ -307,13 +282,16 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     if (filtered.length === 0) return hideSuggestions();
 
+    const suggestions = filtered.slice(0, 10);
+    
     filtered.slice(0, 10).forEach((name) => {
-      const div = document.createElement("div");
-      div.className = "suggestion-item";
-      // match Splash-mode visuals: plain text suggestion (no image)
-      div.textContent = name;
-      div.addEventListener("click", () => {
-        input.value = name;
+    suggestionsDiv.innerHTML = suggestions
+          .map((item) => `<div class="suggestion-item"><img style="margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(item)}" alt="${item}" class="guess-img">${item}</div>`)
+          .join("");
+        suggestionsDiv.style.display = "block";
+      suggestionsDiv.addEventListener("click", () => {
+        const first = suggestionsDiv.querySelector(".suggestion-item");
+        if (first) input.value = first.textContent.trim();
         hideSuggestions();
         submitGuess();
       });
@@ -352,46 +330,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-function showSuggestions() {
-  const q = input.value.trim().toLowerCase();
-  suggestionsDiv.innerHTML = '';
-  if (!q) return hideSuggestions();
-
-  const filtered = allItems.filter(i => i.toLowerCase().includes(q) && !guessedNames.has(i));
-  if (filtered.length === 0) return hideSuggestions();
-
-  filtered.slice(0, 10).forEach(name => {
-    const div = document.createElement('div');
-    div.className = 'suggestion-item';
-
-    // Create mini icon
-    const img = document.createElement('img');
-    img.src = iconUrl(items[name].Icon || name);
-    img.alt = name;
-    img.style.width = '24px';
-    img.style.height = '24px';
-    img.style.marginRight = '8px';
-    img.style.verticalAlign = 'middle';
-    img.style.objectFit = 'contain';
-    div.appendChild(img);
-
-    // Add name text
-    const span = document.createElement('span');
-    span.textContent = name;
-    div.appendChild(span);
-
-    // Click selects the item
-    div.addEventListener('click', () => {
-      input.value = name;
-      hideSuggestions();
-      submitGuess();
-    });
-
-    suggestionsDiv.appendChild(div);
-  });
-
-  suggestionsDiv.style.display = 'block';
-}
+      guessedNames.add(guess);
+      addGuessRow(guess);
 
       // lose life
       lives = Math.max(0, lives - 1);
@@ -461,5 +401,3 @@ function showSuggestions() {
 
   submitBtn.addEventListener("click", submitGuess);
 })();
-}})
-
