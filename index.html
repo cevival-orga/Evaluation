@@ -8,6 +8,7 @@
       content="Guess the Peak game! A daily guessing game based on the climbing game Peak."
     />
     <title>Peakdle - Guess the Peak Game</title>
+    <link rel="icon" href="images/PEAK_logo.jpg" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -15,6 +16,8 @@
     <nav class="navbar">
       <div class="nav-brand">
         <h1>🏔️ PEAKDLE</h1>
+      <div class="nav-brand" style="cursor: pointer">
+        <h1 id="nav-home">🏔️ PEAKDLE</h1>
       </div>
       <button class="nav-toggle" id="nav-toggle">
         <span></span>
@@ -46,6 +49,8 @@
             <h2>Classic Mode</h2>
             <p>
               Guess the Item in the classic WORDLE format !
+              Guess the Peak level from screenshots in 6 tries. Each wrong guess
+              reveals more of the image.
             </p>
             <button class="play-btn" data-page="classic">Play Classic</button>
           </div>
@@ -55,6 +60,8 @@
             <h2>Splash Mode</h2>
             <p>
               Identify the Item from its blurred sprite !
+              Identify the level from its splash art! A colorful challenge for
+              true Peak fans.
             </p>
             <button class="play-btn" data-page="splash">Play Splash</button>
           </div>
@@ -117,6 +124,78 @@
     </div>
   </div>
 </section>
+      <!-- CLASSIC MODE PAGE -->
+      <section id="classic-page" class="page">
+        <div class="page-header">
+          <button class="back-btn" data-page="home">← Back</button>
+          <h2>🎯 Classic Mode</h2>
+        </div>
+
+        <div class="game-mode">
+          <div class="game-info">
+            <p>Guess the Peak level in 6 tries!</p>
+            <div class="attempts">
+              <span
+                >Attempts:
+                <strong><span id="classic-attempts">0</span>/6</strong></span
+              >
+            </div>
+          </div>
+
+          <!-- Image Display -->
+          <div class="image-container">
+            <div class="blur-overlay" id="classic-blur"></div>
+            <img
+              id="classic-image"
+              src=""
+              alt="Peak level screenshot"
+              class="game-image"
+            />
+          </div>
+
+          <!-- Input Area -->
+          <div class="input-area">
+            <input
+              type="text"
+              id="classic-input"
+              class="level-input"
+              placeholder="Enter level name or number..."
+              autocomplete="off"
+            />
+            <button id="classic-submit" class="submit-btn">Guess</button>
+          </div>
+
+          <!-- Suggestions Dropdown -->
+          <div id="classic-suggestions" class="suggestions-dropdown"></div>
+
+          <!-- Guesses List -->
+          <div class="guesses-container">
+            <h3>Your Guesses:</h3>
+            <div id="classic-guesses" class="guesses-list"></div>
+          </div>
+
+          <!-- Result Modal -->
+          <div id="classic-result" class="result-modal hidden">
+            <div class="result-content">
+              <h2 id="classic-result-title"></h2>
+              <p id="classic-result-message"></p>
+              <div class="result-stats">
+                <p>Attempts: <strong id="classic-result-attempts"></strong></p>
+              </div>
+              <button id="classic-share" class="share-btn">
+                Share Results
+              </button>
+              <button
+                id="classic-play-again"
+                class="play-again-btn"
+                data-page="home"
+              >
+                Back to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- SPLASH MODE PAGE -->
       <section id="splash-page" class="page">
@@ -138,6 +217,7 @@
 
           <!-- Image Display -->
           <div class="image-container">
+            <div class="blur-overlay" id="splash-blur"></div>
             <img
               id="splash-image"
               src=""
@@ -153,6 +233,7 @@
               id="splash-input"
               class="level-input"
               placeholder="Enter items..."
+              placeholder="Enter level name or number..."
               autocomplete="off"
             />
             <button id="splash-submit" class="submit-btn">Guess</button>
@@ -211,6 +292,7 @@
             rel="noopener"
             >Peak</a
           >
+          by Stuff By Blob
         </p>
 
         <div class="footer-badge">
