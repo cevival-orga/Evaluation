@@ -9,15 +9,15 @@ let allItems = []; // Liste de tous les items pour l'autocomplétion
 let wrongGuesses = []; // Liste des mauvaises réponses
 
 function iconUrl64(iconName) {
-    if (!iconName) return ''; 
-    const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
-    return `images/64px-images/64px-${fileName}.webp`;
+  if (!iconName) return "";
+  const fileName = String(iconName).replace(/ /g, "_"); // replace spaces
+  return `images/64px-images/64px-${fileName}.webp`;
 }
 
 function iconUrl192(iconName) {
-    if (!iconName) return ''; 
-    const fileName = String(iconName).replace(/ /g, '_'); // replace spaces
-    return `images/192px-images/192px-${fileName}.webp`;
+  if (!iconName) return "";
+  const fileName = String(iconName).replace(/ /g, "_"); // replace spaces
+  return `images/192px-images/192px-${fileName}.webp`;
 }
 
 // Fonction pour charger et choisir un item aléatoire
@@ -106,7 +106,12 @@ function showSuggestions(input, suggestionsDiv) {
   // Affiche les suggestions
   if (suggestions.length > 0) {
     suggestionsDiv.innerHTML = suggestions
-      .map((item) => `<div class="suggestion-item"><img style="margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(item)}" alt="${item}" class="guess-img">${item}</div>`)
+      .map(
+        (item) =>
+          `<div class="suggestion-item"><img style="margin-right: 8px; vertical-align: middle; object-fit: contain;" src="${iconUrl64(
+            item
+          )}" alt="${item}" class="guess-img">${item}</div>`
+      )
       .join("");
     suggestionsDiv.style.display = "block";
 
@@ -136,6 +141,42 @@ function updateLivesDisplay() {
     livesHearts.textContent =
       "❤️".repeat(Math.max(0, lives)) +
       "🤍".repeat(Math.max(0, MAX_LIVES - lives));
+  }
+}
+
+// Fonction pour créer des confettis de victoire
+function createConfetti() {
+  const emojis = ["🎉", "✨", "🎊", "🎆", "👏", "🎁"];
+  const confettiCount = 40;
+
+  for (let i = 0; i < confettiCount; i++) {
+    const confetti = document.createElement("div");
+    confetti.className = "confetti";
+    confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    confetti.style.left = Math.random() * 100 + "vw";
+    confetti.style.animationDelay = Math.random() * 0.3 + "s";
+    confetti.style.animationDuration = Math.random() * 2 + 2 + "s";
+    document.body.appendChild(confetti);
+
+    setTimeout(() => confetti.remove(), 4000);
+  }
+}
+
+// Fonction pour créer des particules de défaite
+function createDefeatParticles() {
+  const emojis = ["💀", "💔", "😭", "⚠️"];
+  const particleCount = 25;
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "defeat-particle";
+    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    particle.style.left = Math.random() * 100 + "vw";
+    particle.style.animationDelay = Math.random() * 0.5 + "s";
+    particle.style.animationDuration = Math.random() * 1.5 + 2 + "s";
+    document.body.appendChild(particle);
+
+    setTimeout(() => particle.remove(), 3500);
   }
 }
 
@@ -219,12 +260,16 @@ function checkAnswer() {
     const resultLives = document.getElementById("splash-result-lives");
 
     if (resultModal && resultTitle && resultMessage && resultLives) {
-      resultTitle.textContent = "🎉 Correct!";
+      resultTitle.innerHTML =
+        '<span style="font-size: 3rem;">🎉</span><br>Correct!';
       resultMessage.textContent = `The item was ${currentItemName}.`;
       resultLives.textContent = String(lives);
       resultModal.classList.remove("hidden");
-    }
+      resultModal.classList.add("victory");
 
+      // Lance les confettis de victoire
+      createConfetti();
+    }
     input.disabled = true;
     if (submitBtn) submitBtn.disabled = true;
     console.log("🎉 Bravo ! Tu as trouvé le bon item : " + currentItemName);
@@ -260,12 +305,16 @@ function checkAnswer() {
       const resultLives = document.getElementById("splash-result-lives");
 
       if (resultModal && resultTitle && resultMessage && resultLives) {
-        resultTitle.textContent = "💀 Out of lives!";
+        resultTitle.innerHTML =
+          '<span style="font-size: 3rem;">💀</span><br>Out of lives!';
         resultMessage.textContent = `The item was ${currentItemName}.`;
         resultLives.textContent = String(lives);
         resultModal.classList.remove("hidden");
-      }
+        resultModal.classList.add("defeat");
 
+        // Lance les particules de défaite
+        createDefeatParticles();
+      }
       input.disabled = true;
       if (submitBtn) submitBtn.disabled = true;
       console.log(
