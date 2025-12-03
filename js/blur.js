@@ -14,7 +14,15 @@ let guessedNames = new Set();
 
 const input = document.getElementById('splash-input');
 const suggestionsDiv = document.getElementById('splash-suggestions');
-const guess = document.getElementById('splash-guesses');
+
+const submitBtn = document.getElementById('splash-submit');
+const guessesList = document.getElementById('splash-guesses');
+const livesSpan = document.getElementById('splash-lives');
+const livesHearts = document.getElementById('splash-lives-hearts');
+const resultModal = document.getElementById('splash-result');
+const resultTitle = document.getElementById('splash-result-title');
+const resultMessage = document.getElementById('splash-result-message');
+const resultLives = document.getElementById('splash-result-lives');
 // Fonction pour charger et choisir un item aléatoire
 
 function hideSuggestions() {
@@ -140,6 +148,63 @@ function showSuggestions() {
 
   suggestionsDiv.style.display = 'block';
 }
+
+      function submitGuess() {
+        const guess = input.value.trim();
+        if (!guess) return;
+        if (input.disabled) return;
+
+        // correct
+        if (guess === targetName) {
+          resultTitle.textContent = '🎉 Correct!';
+          resultMessage.textContent = `The item was ${targetName}.`;
+          resultLives.textContent = String(lives);
+          resultModal.classList.remove('hidden');
+          input.disabled = true;
+          submitBtn.disabled = true;
+          hideSuggestions();
+          return;
+        }
+
+        // valid item
+        if (guess in items) {
+          if (guessedNames.has(guess)) {
+            resultMessage.textContent = `Already guessed "${guess}"`;
+            setTimeout(() => { resultMessage.textContent = ''; }, 1400);
+            input.value = '';
+            showSuggestions();
+            return;
+          }
+
+          guessedNames.add(guess);
+          
+
+          // lose life
+          lives = Math.max(0, lives - 1);
+          updateLivesDisplay();
+
+          input.value = '';
+          hideSuggestions();
+
+          if (lives <= 0) {
+            resultTitle.textContent = '💀 Out of lives!';
+            resultMessage.textContent = `The item was ${targetName}.`;
+            resultLives.textContent = String(lives);
+            resultModal.classList.remove('hidden');
+            input.disabled = true;
+            submitBtn.disabled = true;
+          }
+          return;
+        }
+
+        // invalid
+        resultMessage.textContent = `Invalid guess: "${guess}"`;
+        setTimeout(() => { resultMessage.textContent = ''; }, 1200);
+        input.value = '';
+        showSuggestions();
+      }
+
+
 // Fonction pour mettre à jour l'affichage des attempts
 function updateAttemptsDisplay() {
   const attemptsElement = document.getElementById('splash-attempts');
