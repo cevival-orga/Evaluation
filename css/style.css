@@ -991,6 +991,61 @@ body::after {
   pointer-events: none;
 }
 
+/* Effet spécial victoire */
+.result-modal.victory .result-content {
+  animation: victoryBounce 0.8s var(--ease-bounce);
+  border-color: var(--energy-green);
+  box-shadow: 0 0 80px rgba(74, 222, 128, 0.6), 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Effet spécial défaite */
+.result-modal.defeat .result-content {
+  animation: defeatShake 0.6s var(--ease-smooth);
+  border-color: var(--danger-red);
+  box-shadow: 0 0 60px rgba(239, 68, 68, 0.5), 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes victoryBounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.95) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+@keyframes defeatShake {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 0;
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px) scale(0.98);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .result-content {
   background: linear-gradient(
     160deg,
@@ -1272,6 +1327,63 @@ footer {
 }
 
 /* ============================================
+   PARTICLES - Confettis & Défaite
+   ============================================ */
+.confetti {
+  position: fixed;
+  font-size: 2rem;
+  top: -50px;
+  z-index: 3000;
+  animation: confettiFall 3s linear forwards;
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.defeat-particle {
+  position: fixed;
+  font-size: 2rem;
+  top: 20%;
+  z-index: 3000;
+  animation: defeatFall 3s ease-in forwards;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5));
+}
+
+@keyframes defeatFall {
+  0% {
+    transform: translateY(0) translateX(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(40vh)
+      translateX(calc((var(--random-x, 0.5) - 0.5) * 200px)) scale(0.7)
+      rotate(180deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh)
+      translateX(calc((var(--random-x, 0.5) - 0.5) * 400px)) scale(0.3)
+      rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ============================================
    SCROLLBAR - Style bois
    ============================================ */
 ::-webkit-scrollbar {
@@ -1416,11 +1528,39 @@ footer {
   display: flex;
   flex-direction: column; /* stack rows vertically */
   gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 127, 63, 0.3) transparent;
 }
+
+/* Scrollbar discret pour Chrome/Safari */
+#classic-guesses::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#classic-guesses::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#classic-guesses::-webkit-scrollbar-thumb {
+  background: rgba(255, 127, 63, 0.3);
+  border-radius: 3px;
+}
+
+#classic-guesses::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 127, 63, 0.5);
+}
+
 #classic-page .guess-row {
   display: flex; /* squares in a row */
   align-items: center;
   gap: 8px;
+  flex-wrap: nowrap;
+  min-width: min-content;
 }
 #classic-page .square {
   width: 110px;
