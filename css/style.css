@@ -1527,44 +1527,49 @@ footer {
 #classic-guesses {
   display: flex;
   flex-direction: column; /* stack rows vertically */
-  gap: 8px;
-  max-height: 400px;
+  gap: 12px;
   overflow-y: auto;
-  overflow-x: auto;
-  padding-right: 8px;
+  overflow-x: scroll; /* toujours afficher la barre horizontale */
+  padding: 12px 12px 32px 12px; /* plus de padding en bas */
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 127, 63, 0.3) transparent;
+  scrollbar-color: rgba(255, 127, 63, 0.6) rgba(26, 31, 46, 0.4);
+  max-height: 580px; /* plus de hauteur */
+  border-radius: 12px; /* arrondir pour que la scrollbar reste à l'intérieur */
+  background: rgba(26, 31, 46, 0.3); /* fond léger pour délimiter la zone */
 }
 
 /* Scrollbar discret pour Chrome/Safari */
 #classic-guesses::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 10px; /* barre horizontale visible mais pas trop grande */
 }
 
 #classic-guesses::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(26, 31, 46, 0.5);
+  border-radius: 5px;
+  margin: 4px; /* marge pour ne pas toucher les bords */
 }
 
 #classic-guesses::-webkit-scrollbar-thumb {
-  background: rgba(255, 127, 63, 0.3);
-  border-radius: 3px;
+  background: rgba(255, 127, 63, 0.7); /* thumb bien visible */
+  border-radius: 7px;
 }
 
 #classic-guesses::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 127, 63, 0.5);
+  background: rgba(255, 127, 63, 0.9);
 }
 
 #classic-page .guess-row {
-  display: flex; /* squares in a row */
+  display: inline-flex; /* inline-flex pour un meilleur scroll horizontal du conteneur */
   align-items: center;
   gap: 8px;
   flex-wrap: nowrap;
-  min-width: min-content;
+  min-width: max-content;
 }
 #classic-page .square {
   width: 110px;
   height: 110px;
+  min-width: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1574,6 +1579,30 @@ footer {
   padding: 6px;
   white-space: pre-wrap;
   box-sizing: border-box;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* Scrollbar discret pour les lignes de guesses */
+#classic-page .guess-row::-webkit-scrollbar {
+  height: 6px;
+}
+#classic-page .guess-row::-webkit-scrollbar-track {
+  background: transparent;
+}
+#classic-page .guess-row::-webkit-scrollbar-thumb {
+  background: rgba(255, 127, 63, 0.25);
+  border-radius: 3px;
+}
+#classic-page .guess-row::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 127, 63, 0.4);
+}
+
+/* Conteneur des guesses */
+.guesses-container {
+  overflow: hidden; /* clipper dans les bordures arrondies */
+  padding: 24px 24px 40px 24px; /* plus de padding en bas */
+  min-height: 650px; /* bloc encore plus grand */
 }
 
 /* Icon stays fixed size */
@@ -1588,16 +1617,27 @@ footer {
 #classic-guesses {
   display: flex;
   flex-direction: column; /* stack rows vertically */
-  gap: 8px;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: scroll; /* barre de scroll horizontale toujours visible */
+  padding: 16px 16px 36px 16px; /* plus d'espace en bas pour la barre */
+  width: 100%;
+  max-width: 100%;
+  max-height: 580px;
+  border-radius: 12px;
+  background: rgba(26, 31, 46, 0.3);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 127, 63, 0.6) rgba(26, 31, 46, 0.4);
 }
 #classic-page .guess-row {
-  display: flex; /* squares in a row */
+  display: inline-flex; /* inline-flex pour un meilleur scroll horizontal du conteneur */
   align-items: center;
   gap: 8px;
 }
 #classic-page .square {
   width: 110px;
   height: 110px;
+  min-width: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1607,6 +1647,8 @@ footer {
   padding: 6px;
   white-space: pre-wrap;
   box-sizing: border-box;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
 #classic-page .green {
