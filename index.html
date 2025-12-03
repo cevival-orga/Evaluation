@@ -26,7 +26,7 @@
         <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
         <li><a href="#" class="nav-link" data-page="classic">Classic</a></li>
         <li><a href="#" class="nav-link" data-page="splash">Splash</a></li>
-        <li><a href="#" class="nav-link" data-page="food">Food</a></li>
+        <li><a href="#" class="nav-link" data-page="detective">Detective</a></li>
       </ul>
     </nav>
 
@@ -57,11 +57,11 @@
             <button class="play-btn" data-page="splash">Play Splash</button>
           </div>
 
-          <div class="game-card" data-game="food">
-            <div class="game-icon">🥖</div>
-            <h2>Food Mode</h2>
-            <p>Guess the food Item in the WORLDE format !</p>
-            <button class="play-btn" data-page="food">Play Food</button>
+          <div class="game-card" data-game="detective">
+            <div class="game-icon">🔍</div>
+            <h2>Detective Mode</h2>
+            <p>Guess the item by it's description !</p>
+            <button class="play-btn" data-page="detective">Play Detective</button>
           </div>
         </div>
 
@@ -215,74 +215,65 @@
         </div>
       </section>
       
-    <!-- FOOD MODE PAGE -->
-    <section id="food-page" class="page">
-      <div class="page-header">
-        <button class="back-btn" data-page="home">← Back</button>
-        <h2>🥖 Food Mode</h2>
-      </div>
-
-      <div class="game-mode">
-        <div class="game-info">
-          <p>Guess the Peak food item!</p>
-          <div class="lives">
-            Lives: <strong id="food-lives">7</strong>/7
-            <span id="food-lives-hearts" style="margin-left: 8px"
-              >❤️❤️❤️❤️❤️❤️❤️</span
-            >
-          </div>
+      <section id="detective-page" class="page">
+        <div class="page-header">
+          <button class="back-btn" data-page="home">← Back</button>
+          <h2>🕵️ Detective Mode</h2>
         </div>
 
-        <!-- Input Area + Autocomplete (fills the whole row) -->
-        <div class="input-area">
-          <input
-            type="text"
-            id="food-input"
-            class="level-input"
-            placeholder="Enter item name..."
-            autocomplete="off"
-          />
-          <button id="food-submit" class="submit-btn">Guess</button>
-
-          <!-- Autocomplete dropdown (Splash-style visuals) -->
-        </div>
-        <div id="food-suggestions" class="suggestions-dropdown"></div>
-
-        <!-- Guesses List -->
-        <div class="guesses-container">
-          <h3>Your Guesses:</h3>
-          <div
-            id="food-guesses"
-            style="
-              display: flex;
-              gap: 8px;
-              overflow-x: auto;
-              padding-bottom: 4px;
-            "
-          ></div>
-        </div>
-
-        <!-- Result Modal -->
-        <div id="food-result" class="result-modal hidden">
-          <div class="result-content">
-            <h2 id="food-result-title"></h2>
-            <p id="food-result-message"></p>
-            <div class="result-stats">
-              <p>
-                Lives remaining: <strong id="food-result-lives"></strong>
-              </p>
+        <div class="game-mode">
+          <div class="game-info">
+            <p>Reveal the hidden item description and guess the item!</p>
+            <div class="lives">
+              Lives: <strong id="detective-lives">7</strong>/7
+              <span id="detective-lives-hearts" style="margin-left: 8px">
+                ❤️❤️❤️❤️❤️❤️❤️
+              </span>
             </div>
-            <button
-              id="food-play-again"
-              class="play-again-btn"
-              data-page="home"
-            >
-              Back to Home
-            </button>
+          </div>
+
+          <!-- Hidden Clue Box -->
+          <div class="clue-container">
+            <h3>Clue:</h3>
+            <div id="detective-clue" class="detective-clue"></div>
+          </div>
+
+          <!-- Input Area + Autocomplete -->
+          <div class="input-area">
+            <input
+              type="text"
+              id="detective-input"
+              class="level-input"
+              placeholder="Enter item name..."
+              autocomplete="off"
+            />
+            <button id="detective-submit" class="submit-btn">Guess</button>
+          </div>
+
+          <div id="detective-suggestions" class="suggestions-dropdown"></div>
+
+          <!-- Result Modal -->
+          <div id="detective-result" class="result-modal hidden">
+            <div class="result-content">
+              <h2 id="detective-result-title"></h2>
+              <p id="detective-result-message"></p>
+              <div class="result-stats">
+                <p>
+                  Lives remaining:
+                  <strong id="detective-result-lives"></strong>
+                </p>
+              </div>
+              <button
+                id="detective-play-again"
+                class="play-again-btn"
+                data-page="home"
+              >
+                Back to Home
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
 
     </div>
@@ -318,7 +309,8 @@
       </div>
     </footer>
 
-    <script src="js/script.js"></script>
-    <script src="js/blur.js"></script>
+    <script src="js/scriptClassic.js"></script>
+    <script src="js/blurSplash.js"></script>
+    <script src="js/detective.js"></script>
   </body>
 </html>
