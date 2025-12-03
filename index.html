@@ -56,8 +56,8 @@
             <div class="game-icon">🎨</div>
             <h2>Splash Mode</h2>
             <p>
-              Recognize the item from its blurred image! The picture gradually
-              reveals itself with each attempt.
+              Recognize the item from its pixelated image! The picture becomes
+              clearer with each attempt.
             </p>
             <button class="play-btn" data-page="splash">Play Splash</button>
           </div>
@@ -120,6 +120,7 @@
           <!-- Result Modal -->
           <div id="classic-result" class="result-modal hidden">
             <div class="result-content">
+              <button class="modal-close" aria-label="Close">✖</button>
               <h2 id="classic-result-title"></h2>
               <p id="classic-result-message"></p>
               <div class="result-stats">
@@ -148,7 +149,7 @@
 
         <div class="game-mode">
           <div class="game-info">
-            <p>Identify the Peak item from the sprite!</p>
+            <p>Identify the Peak item from the pixelated sprite!</p>
             <div class="lives">
               Lives: <strong id="splash-lives">7</strong>/7
               <span id="splash-lives-hearts" style="margin-left: 8px"
@@ -174,8 +175,7 @@
               type="text"
               id="splash-input"
               class="level-input"
-              placeholder="Enter items..."
-              placeholder="Enter level name or number..."
+              placeholder="Enter item name..."
               autocomplete="off"
             />
             <button id="splash-submit" class="submit-btn">Guess</button>
@@ -193,6 +193,7 @@
           <!-- Result Modal -->
           <div id="splash-result" class="result-modal hidden">
             <div class="result-content">
+              <button class="modal-close" aria-label="Close">✖</button>
               <h2 id="splash-result-title"></h2>
               <p id="splash-result-message"></p>
               <div class="result-stats">

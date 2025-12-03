@@ -107,6 +107,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // Close buttons (✖) on modals
+  const modalCloseButtons = document.querySelectorAll(".modal-close");
+  modalCloseButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const modal = btn.closest(".result-modal");
+      if (modal) {
+        modal.classList.add("hidden");
+      }
+    });
+  });
+
   // Logo nav-brand click (Home)
   if (navHome) {
     navHome.addEventListener("click", function (e) {
