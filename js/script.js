@@ -102,8 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
   playAgainButtons.forEach((button) => {
     button.addEventListener("click", function (e) {
       e.preventDefault();
-      const pageId = this.dataset.page;
-      switchPage(pageId);
+      // Refresh the page when going back to home
+      location.reload();
     });
   });
 
