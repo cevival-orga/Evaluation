@@ -72,9 +72,9 @@ function pixelateImage(pixelationLevel) {
 // Fonction pour charger et choisir un item aléatoire
 async function getRandomItemImageUrl() {
   try {
-    const response = await fetch("datas.json");
+    const response = await fetch("data/datas.json");
     const datas = await response.json();
-    const resChoice = await fetch("daily.json")
+    const resChoice = await fetch("data/daily.json")
     const data_choice = await resChoice.json();
 
     // Charge l'item depuis daily.kson
@@ -121,7 +121,7 @@ async function loadRandomImage() {
 // Fonction pour charger la liste des items
 async function loadItemsList() {
   try {
-    const response = await fetch("datas.json");
+    const response = await fetch("data/datas.json");
     const datas = await response.json();
     allItems = Object.keys(datas);
   } catch (error) {
@@ -233,7 +233,7 @@ async function addGuessToDisplay(itemName, isCorrect) {
 
   // Récupère les données pour obtenir l'icône
   try {
-    const response = await fetch("datas.json");
+    const response = await fetch("data/datas.json");
     const datas = await response.json();
     const itemData = datas[itemName];
 

@@ -216,8 +216,8 @@ function createDefeatParticles() {
 }
 
 (async () => {
-  const DATA_FILE = "datas.json";
-  const CHOICE_FILE = "daily.json";
+  const DATA_FILE = "data/datas.json";
+  const CHOICE_FILE = "data/daily.json";
   const MAX_LIVES = 7;
 
   let items = {},
@@ -474,8 +474,8 @@ function createDefeatParticles() {
    ============================================ */
 
 (async () => {
-  const DATA_FILE = "datas notes.json";
-  const CHOICE_FILE = "daily.json";
+  const DATA_FILE = "data/datas notes.json";
+  const CHOICE_FILE = "data/daily.json";
   const MAX_LIVES = 7;
 
 
@@ -494,7 +494,7 @@ function createDefeatParticles() {
 //usage:
 let strength = 0;  
 
-readTextFile("config.json", function(text){
+readTextFile("data/config.json", function(text){
       var data = JSON.parse(text);
       strength = data.Strength;
       console.log(strength)
