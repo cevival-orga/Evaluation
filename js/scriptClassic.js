@@ -474,6 +474,31 @@ function createDefeatParticles() {
   const DATA_FILE = "datas notes.json";
   const MAX_LIVES = 7;
 
+
+  function readTextFile(file, callback) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            callback(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+}
+
+//usage:
+let strength = 0;  
+
+readTextFile("config.json", function(text){
+      var data = JSON.parse(text);
+      strength = data.Strength;
+      console.log(strength)
+    });
+
+
+
+
   let items = {},
     targetName = "",
     targetItem = null,
@@ -501,9 +526,9 @@ function createDefeatParticles() {
     return text.replace(".", "\n").split("").map((ch) => (/[a-zA-Z0-9]/.test(ch) ? "_" : ch));
   }
 
-  function reveal20Percent() {
+  function revealPercent() {
     const total = clueMasked.length;
-    let toReveal = Math.floor(total * 0.2);
+    let toReveal = Math.floor(total * strength);
 
     const hiddenIndexes = [];
     for (let i = 0; i < total; i++) {
@@ -614,7 +639,7 @@ function createDefeatParticles() {
 
         lives = Math.max(0, lives - 1);
         updateLivesDisplay();
-        reveal20Percent();
+        revealPercent();
       }
 
 
